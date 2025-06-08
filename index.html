@@ -5,20 +5,36 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>DTGSLIME — Home</title>
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* hide the content until password check passes */
+    #main-content { display: none; }
+  </style>
 </head>
 <body>
 
-  <main class="home-links">
-    <!-- Left: goes to your new skin-player subpage -->
-    <a href="skin-player.html" class="home-link">
-      <img src="assets/images/bb-dtg-shell.png" alt="BB Shell">
-    </a>
+  <div id="main-content">
+    <main class="home-links">
+      <a href="skin-player.html" class="home-link">
+        <img src="assets/images/bb-dtg-shell.png" alt="BB Shell">
+      </a>
+      <a href="grid.html" class="home-link">
+        <img src="assets/images/MILKCARTON-ISOLATE.png" alt="Milk Carton">
+      </a>
+    </main>
+  </div>
 
-    <!-- Right: grid subpage -->
-    <a href="grid.html" class="home-link">
-      <img src="assets/images/MILKCARTON-ISOLATE.png" alt="Milk Carton">
-    </a>
-  </main>
-
+  <script>
+    (function(){
+      const PASS  = 'BIGSLIME';  // ← replace this
+      const entry = prompt('Enter password to view this site:');
+      if (entry === PASS) {
+        // content now exists in the DOM, so this will work
+        document.getElementById('main-content').style.display = 'block';
+      } else {
+        document.body.innerHTML = 
+          '<h2 style="text-align:center; margin-top:40vh;">Access denied.</h2>';
+      }
+    })();
+  </script>
 </body>
 </html>
