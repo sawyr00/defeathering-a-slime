@@ -19,6 +19,18 @@
       <a href="index.html">Back to Home</a>
     </p>
   </footer>
+<script>
+  (function(){
+    const PASS  = 'BIGSLIME';  // ← your password
+    const entry = prompt('Enter password to access this page:');
+    if (entry !== PASS) {
+      document.body.innerHTML = 
+        '<h2 style="text-align:center; margin-top:40vh;">Access denied.</h2>';
+    }
+  })();
+</script>
+
+
 
 </body>
 </html>
