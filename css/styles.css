@@ -191,3 +191,7 @@ footer .footer-link a {
   }
 }
 
+html, body {
+  overflow-x: hidden;
+}
+
