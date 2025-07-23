@@ -12,7 +12,12 @@ html, body {
 /* Header */
 .grid-header img {
   display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
   margin: 20px auto;
+  padding: 0 10px;          /* optional: softens edge clipping on narrow screens */
+  box-sizing: border-box;  /* ensures padding doesn't cause overflow */
 }
 
 /* Footer link */
