@@ -12,13 +12,12 @@ html, body {
 /* Header */
 .grid-header img {
   display: block;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
   margin: 20px auto;
-  padding: 0 10px;          /* optional: softens edge clipping on narrow screens */
-  box-sizing: border-box;  /* ensures padding doesn't cause overflow */
+  width: auto;
+  max-width: none;
+  height: auto;
 }
+
 
 /* Footer link */
 footer .footer-link a {
@@ -40,7 +39,11 @@ footer .footer-link a {
   gap: 15px;
   justify-content: center;
   padding: 20px;
+  box-sizing: border-box;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
+
 
 .video-card {
   background-color: #000000;
@@ -194,4 +197,32 @@ footer .footer-link a {
 html, body {
   overflow-x: hidden;
 }
+
+@media (orientation: portrait) and (max-width: 600px) {
+  .thumbnail-grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .video-card {
+    width: 100%;
+  }
+
+  .video-card img {
+    height: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .grid-header img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+}
+
 
