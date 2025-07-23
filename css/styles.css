@@ -157,3 +157,23 @@ footer .footer-link a {
   height: auto;
   cursor: pointer;
 }
+
+
+
+/* ───────────────────────────────────────────────────────
+   Responsive adjustments for mobile
+─────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .home-links {
+    flex-direction: column;
+    gap: 40px;       /* reduce vertical spacing on mobile */
+    padding: 40px 20px;
+    height: auto;    /* let it grow with content */
+  }
+
+  .home-link img {
+    width: 80vw;     /* scale nicely on small screens */
+    max-width: 300px;
+    height: auto;
+  }
+}
