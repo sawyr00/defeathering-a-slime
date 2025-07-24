@@ -243,4 +243,41 @@ html, body {
 }
 
 
+/* Milk carton hover flip */
+.milk-hover {
+  position: relative;
+  display: inline-block;
+}
+
+.milk-hover img {
+  display: block;
+  transition: opacity 0.3s ease;
+  width: 100%;
+  height: auto;
+}
+
+/* Default: front visible, back hidden */
+.milk-hover .milk-front {
+  position: relative;
+  z-index: 2;
+}
+
+.milk-hover .milk-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* On hover: front fades out, back fades in */
+.milk-hover:hover .milk-front {
+  opacity: 0;
+}
+
+.milk-hover:hover .milk-back {
+  opacity: 1;
+  z-index: 2;
+}
 
