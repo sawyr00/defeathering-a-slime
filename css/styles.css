@@ -281,3 +281,37 @@ html, body {
   opacity: 1;
   z-index: 2;
 }
+
+
+/* Shell hover: swap image with video */
+.shell-hover {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.shell-hover img,
+.shell-hover video {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: opacity 0.3s ease;
+}
+
+.shell-hover .shell-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.shell-hover:hover .shell-video {
+  opacity: 1;
+  z-index: 2;
+}
+
+.shell-hover:hover .shell-img {
+  opacity: 0;
+}
