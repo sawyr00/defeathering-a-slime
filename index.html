@@ -18,10 +18,11 @@
     <main class="home-links">
       <a href="BIGSUMMERPLAYER.html" class="home-link shell-hover">
   <img class="shell-img" src="assets/images/bb-dtg-shell.png" alt="BB Shell">
-  <video class="shell-video" muted loop preload="auto" playsinline>
-    <source src="assets/video/bb-dtg-hover.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
+ <video class="shell-video" muted playsinline loop preload="auto">
+  <source src="assets/video/bb-dtg-hover.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 </a>
 
      <a href="bigslimereviews.html" class="home-link milk-hover">
@@ -45,5 +46,22 @@
    }
 -->  })();
   </script>
+
+<script>
+  const shell = document.querySelector('.shell-hover');
+  const video = shell.querySelector('video');
+
+  shell.addEventListener('mouseenter', () => {
+    video.play().catch(err => {
+      console.error("Autoplay failed:", err);
+    });
+  });
+
+  shell.addEventListener('mouseleave', () => {
+    video.pause();
+    video.currentTime = 0;
+  });
+</script>
+
 </body>
 </html>
