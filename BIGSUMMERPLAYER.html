@@ -1,36 +1,75 @@
+Replace the entire `BIGSUMMERPLAYER.html` file with this:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>DTGSLIME — Skin Player</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DTGSLIME - Big Summer Player</title>
+  <style>
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: #000;
+      color: #fff;
+      overflow: hidden;
+      font-family: "Courier New", Courier, monospace;
+    }
+
+    .home-link {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 10;
+      color: lavender;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .player-stage {
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 40px;
+      box-sizing: border-box;
+    }
+
+    .stream-frame {
+      width: min(1000px, calc(100vw - 80px));
+      height: min(1000px, calc(100vw - 80px));
+      max-height: calc(100svh - 80px);
+      aspect-ratio: 1 / 1;
+      border: 0;
+      display: block;
+      background: #000;
+    }
+
+    @media (max-width: 700px) {
+      .player-stage {
+        padding: 48px 16px 16px;
+      }
+
+      .stream-frame {
+        width: min(1000px, calc(100vw - 32px));
+        height: min(1000px, calc(100vw - 32px));
+        max-height: calc(100svh - 64px);
+      }
+    }
+  </style>
 </head>
 <body>
+  <a class="home-link" href="/">return to home</a>
 
-  <main class="skin-player-main">
-    <h2>Skin Player Page</h2>
-    <p>This is where your “skin-player” content will live.</p>
-    <!-- Insert your Three.js or other code here -->
+  <main class="player-stage">
+    <iframe
+      class="stream-frame"
+      title="Big Summer Player"
+      allow="autoplay; fullscreen; gamepad; microphone; clipboard-read; clipboard-write"
+      src="https://clock-active-creek-diy.trycloudflare.com/slimeplayer.html">
+    </iframe>
   </main>
-
-  <footer>
-    <p class="footer-link">
-      <a href="index.html">Back to Home</a>
-    </p>
-  </footer>
-<script>
-  (function(){
-    const PASS  = 'BIGSLIME';  // ← your password
-    const entry = prompt('Enter password to access this page:');
-    if (entry !== PASS) {
-      document.body.innerHTML = 
-        '<h2 style="text-align:center; margin-top:40vh;">Access denied.</h2>';
-    }
-  })();
-</script>
-
-
-
 </body>
 </html>
+```
