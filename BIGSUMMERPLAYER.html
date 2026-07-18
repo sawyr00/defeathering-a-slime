@@ -5,16 +5,46 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>DTGSLIME — Skin Player</title>
   <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    .rotation-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .rotation-clip {
+      width: min(540px, 30vw);
+      height: auto;
+      display: block;
+    }
+  </style>
 </head>
 <body>
 
   <main class="skin-player-main">
-    <h2>Skin Player Page</h2>
-<img
-  class="rotation-clip"
-  src="assets/images/rotations/rotate_counterclockwise_90_alpha_60fps_hold3s.apng.png"
-  alt="Front to left rotation"
->
+    <h2>Beach Slime Player</h2>
+<section class="rotation-row">
+  <img
+    class="rotation-clip"
+    src="assets/images/rotations/rotate_counterclockwise_90_alpha_60fps_hold3s.apng.png"
+    alt="Front to left rotation"
+  >
+
+  <img
+    class="rotation-clip"
+    src="assets/images/rotations/rotate_counterclockwise_90_plus_90_plus_90_plus_90_alpha_60fps_hold3s.apng.png"
+    alt="Counterclockwise full rotation"
+  >
+
+  <img
+    class="rotation-clip"
+    src="assets/images/rotations/rotate_top_rightside_alpha_60fps_hold3s.apng.png"
+    alt="Top to right side rotation"
+  >
+</section>
     <!-- Insert your Three.js or other code here -->
   </main>
 
