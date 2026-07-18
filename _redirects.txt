@@ -1,1 +1,3 @@
-/*    https://defeathering-a-slime.sgenhanced.com/:splat   301!
+/bigsummerplayer /BIGSUMMERPLAYER.html 200
+/BIGSUMMERPLAYER.html /BIGSUMMERPLAYER.html 200
+/* /index.html 200
