@@ -34,21 +34,21 @@
     .sequence-page {
       min-height: 100svh;
       box-sizing: border-box;
-      padding: 72px 24px 48px;
+      padding: 58px 24px 34px;
     }
 
     .sequence-stack {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 28px;
+      gap: 10px;
     }
 
     .sequence-row {
       display: flex;
       justify-content: flex-start;
       align-items: flex-start;
-      gap: 24px;
+      gap: 22px;
       flex-wrap: wrap;
     }
 
@@ -58,20 +58,35 @@
       display: block;
     }
 
+    .player-sequence {
+      width: min(480px, calc(100vw - 48px));
+    }
+
+    .pbj-sequence {
+      width: min(560px, calc(100vw - 48px));
+      object-fit: contain;
+    }
+
     video.skin-sequence {
       object-fit: contain;
     }
 
     @media (max-width: 700px) {
       .sequence-page {
-        padding: 64px 16px 36px;
+        padding: 58px 16px 28px;
+      }
+
+      .sequence-stack {
+        gap: 8px;
       }
 
       .sequence-row {
-        gap: 18px;
+        gap: 14px;
       }
 
-      .skin-sequence {
+      .skin-sequence,
+      .player-sequence,
+      .pbj-sequence {
         width: min(320px, calc(100vw - 32px));
       }
     }
@@ -106,27 +121,13 @@
 
       <div class="sequence-row">
         <img
-          class="skin-sequence"
-          src="assets/images/trackslimes/trackslimes_expand_hold5s_retract_hold5s_no_np_alpha_20fps.apng.png"
-          alt="BB Trackslimes sequence"
-        >
-
-        <img
-          class="skin-sequence"
-          src="assets/images/bbnetworkring/bbnetworkring_expand_spin5s_retract_hold5s_slimespread_no_np_alpha_20fps.apng.png"
-          alt="BB Network Ring sequence"
-        >
-      </div>
-
-      <div class="sequence-row">
-        <img
-          class="skin-sequence"
-          src="assets/images/visualizer 1/play_first_hatch_slimebeach_no_np_alpha_10s_10fps.apng.png"
+          class="skin-sequence player-sequence"
+          src="assets/images/visualizer-1/play_first_hatch_slimebeach_no_np_alpha_10s_10fps.apng.png"
           alt="Visualizer 1 sequence"
         >
 
         <video
-          class="skin-sequence"
+          class="skin-sequence pbj-sequence"
           src="assets/images/pbj_sequence/pbjvisualizer_circle_overlay_cleanbody_alpha_30fps.webm"
           autoplay
           loop
@@ -135,9 +136,23 @@
         ></video>
 
         <img
-          class="skin-sequence"
-          src="assets/images/visualizer 4 cd spin/cdspin_visualizer4_stable_loop_with_window_overlays_no_np_alpha_60fps.apng.png"
+          class="skin-sequence player-sequence"
+          src="assets/images/visualizer-4-cd-spin/cdspin_visualizer4_stable_loop_with_window_overlays_no_np_alpha_60fps.apng.png"
           alt="Disc spin visualizer sequence"
+        >
+      </div>
+
+      <div class="sequence-row">
+        <img
+          class="skin-sequence player-sequence"
+          src="assets/images/trackslimes/trackslimes_expand_hold5s_retract_hold5s_no_np_alpha_20fps.apng.png"
+          alt="BB Trackslimes sequence"
+        >
+
+        <img
+          class="skin-sequence player-sequence"
+          src="assets/images/bbnetworkring/bbnetworkring_expand_spin5s_retract_hold5s_slimespread_no_np_alpha_20fps.apng.png"
+          alt="BB Network Ring sequence"
         >
       </div>
 
