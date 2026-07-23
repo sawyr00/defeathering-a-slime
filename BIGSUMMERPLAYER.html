@@ -2,74 +2,146 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>DTGSLIME — Skin Player</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DTGSLIME - Big Summer Player</title>
 
- <style>
-  .skin-player-main {
-    text-align: left;
-  }
-
-  .rotation-row {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 24px;
-    flex-wrap: wrap;
-    width: 100%;
-  }
-
-  .rotation-clip {
-    width: min(540px, 30vw);
-    height: auto;
-    display: block;
-  }
-</style>
-</head>
-<body>
-
-  <main class="skin-player-main">
-    <h2>Beach Slime Player</h2>
-<section class="rotation-row">
-  <img
-    class="rotation-clip"
-    src="assets/images/rotations/rotate_counterclockwise_90_alpha_60fps_hold3s.apng.png"
-    alt="Front to left rotation"
-  >
-
-  <img
-    class="rotation-clip"
-    src="assets/images/rotations/rotate_clockwise_180_alpha_60fps_start_hold2s_end_hold3s.apng.png"
-    alt="Counterclockwise full rotation"
-  >
-
-  <img
-    class="rotation-clip"
-    src="assets/images/rotations/rotate_rightside_to_top_alpha_60fps_start_hold1s_end_hold3s.apng.png"
-    alt="Top to right side rotation"
-  >
-</section>
-    <!-- Insert your Three.js or other code here -->
-  </main>
-
-  <footer>
-    <p class="footer-link">
-      <a href="index.html">Back to Home</a>
-    </p>
-  </footer>
-<script>
-  (function(){
-    const PASS  = 'BIGSLIME';  // ← your password
-    const entry = prompt('Enter password to access this page:');
-    if (entry !== PASS) {
-      document.body.innerHTML = 
-        '<h2 style="text-align:center; margin-top:40vh;">Access denied.</h2>';
+  <style>
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: #000;
+      color: #fff;
+      font-family: "Courier New", Courier, monospace;
     }
-  })();
-</script>
 
+    body {
+      overflow-x: hidden;
+    }
 
+    .home-link {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 10;
+      color: lavender;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 0;
+    }
 
+    .sequence-page {
+      min-height: 100svh;
+      box-sizing: border-box;
+      padding: 72px 24px 48px;
+    }
+
+    .sequence-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 28px;
+    }
+
+    .sequence-row {
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .skin-sequence {
+      width: min(360px, calc(100vw - 48px));
+      height: auto;
+      display: block;
+    }
+
+    video.skin-sequence {
+      object-fit: contain;
+    }
+
+    @media (max-width: 700px) {
+      .sequence-page {
+        padding: 64px 16px 36px;
+      }
+
+      .sequence-row {
+        gap: 18px;
+      }
+
+      .skin-sequence {
+        width: min(320px, calc(100vw - 32px));
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="home-link" href="index.html">return to home</a>
+
+  <main class="sequence-page">
+    <section class="sequence-stack" aria-label="Big Summer Player sequences">
+
+      <div class="sequence-row">
+        <img
+          class="skin-sequence"
+          src="images/front_to_left_rotation_alpha_60fps_hold3s.apng.png"
+          alt="Front to left rotation"
+        >
+
+        <img
+          class="skin-sequence"
+          src="images/rotate_counterclockwise_90_plus_90_plus_90_plus_90_alpha_60fps_hold3s.apng.png"
+          alt="Full counterclockwise rotation"
+        >
+
+        <img
+          class="skin-sequence"
+          src="images/rotate_top_rightside_alpha_60fps_hold3s.apng.png"
+          alt="Top and right side rotation"
+        >
+      </div>
+
+      <div class="sequence-row">
+        <img
+          class="skin-sequence"
+          src="images/trackslimes_expand_hold_retract_hold_alpha_60fps.apng.png"
+          alt="BB Trackslimes sequence"
+        >
+
+        <img
+          class="skin-sequence"
+          src="images/bbnetworkring_expand_rotate_retract_hold_alpha_60fps.apng.png"
+          alt="BB Network Ring sequence"
+        >
+      </div>
+
+      <div class="sequence-row">
+        <img
+          class="skin-sequence"
+          src="images/play_first_hatch_visualizer1_no_np_alpha_60fps.apng.png"
+          alt="Visualizer 1 sequence"
+        >
+
+        <video
+          class="skin-sequence"
+          src="images/pbjvisualizer_circle_overlay_cleanbody_alpha_30fps.webm"
+          autoplay
+          loop
+          muted
+          playsinline
+        ></video>
+
+        <img
+          class="skin-sequence"
+          src="images/cdspin_visualizer4_with_hatch_window_and_cd_overlay_alpha_60fps.apng.png"
+          alt="Disc spin visualizer sequence"
+        >
+      </div>
+
+    </section>
+  </main>
 </body>
 </html>
