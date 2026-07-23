@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DTGSLIME - Big Summer Player</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>DTGSLIME — Skin Player</title>
+  <link rel="stylesheet" href="css/styles.css">
 
   <style>
     html,
@@ -19,61 +20,55 @@
       overflow-x: hidden;
     }
 
-    .home-link {
-      position: fixed;
-      top: 18px;
-      left: 18px;
-      z-index: 10;
-      color: lavender;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: bold;
-      letter-spacing: 0;
-    }
-
     .sequence-page {
       min-height: 100svh;
       box-sizing: border-box;
-      padding: 58px 24px 34px;
+      padding: 42px 22px 28px;
     }
 
     .sequence-stack {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 10px;
+      gap: 4px;
     }
 
     .sequence-row {
       display: flex;
       justify-content: flex-start;
       align-items: flex-start;
-      gap: 22px;
+      gap: 18px;
       flex-wrap: wrap;
     }
 
+    .sequence-item {
+      width: min(540px, 30vw);
+      height: min(540px, 30vw);
+      display: grid;
+      place-items: center;
+      overflow: visible;
+    }
+
     .skin-sequence {
-      width: min(360px, calc(100vw - 48px));
+      width: 100%;
       height: auto;
       display: block;
     }
 
     .player-sequence {
-      width: min(480px, calc(100vw - 48px));
+      width: 132%;
+      max-width: none;
     }
 
     .pbj-sequence {
-      width: min(560px, calc(100vw - 48px));
-      object-fit: contain;
-    }
-
-    video.skin-sequence {
+      width: 155%;
+      max-width: none;
       object-fit: contain;
     }
 
     @media (max-width: 700px) {
       .sequence-page {
-        padding: 58px 16px 28px;
+        padding: 58px 14px 24px;
       }
 
       .sequence-stack {
@@ -81,82 +76,111 @@
       }
 
       .sequence-row {
-        gap: 14px;
+        gap: 12px;
       }
 
-      .skin-sequence,
+      .sequence-item {
+        width: min(320px, calc(100vw - 28px));
+        height: min(320px, calc(100vw - 28px));
+      }
+
       .player-sequence,
       .pbj-sequence {
-        width: min(320px, calc(100vw - 32px));
+        width: 100%;
       }
     }
   </style>
 </head>
 
 <body>
-  <a class="home-link" href="index.html">return to home</a>
-
   <main class="sequence-page">
     <section class="sequence-stack" aria-label="Big Summer Player sequences">
 
       <div class="sequence-row">
-        <img
-          class="skin-sequence"
-          src="assets/images/rotations/rotate_counterclockwise_90_alpha_60fps_hold3s.apng.png"
-          alt="Front to left rotation"
-        >
+        <div class="sequence-item">
+          <img
+            class="skin-sequence"
+            src="assets/images/rotations/rotate_counterclockwise_90_alpha_60fps_hold3s.apng.png"
+            alt="Front to left rotation"
+          >
+        </div>
 
-        <img
-          class="skin-sequence"
-          src="assets/images/rotations/rotate_counterclockwise_90_plus_90_plus_90_plus_90_alpha_60fps_hold3s.apng.png"
-          alt="Full counterclockwise rotation"
-        >
+        <div class="sequence-item">
+          <img
+            class="skin-sequence"
+            src="assets/images/rotations/rotate_counterclockwise_90_plus_90_plus_90_plus_90_alpha_60fps_hold3s.apng.png"
+            alt="Full counterclockwise rotation"
+          >
+        </div>
 
-        <img
-          class="skin-sequence"
-          src="assets/images/rotations/rotate_top_rightside_alpha_60fps_hold3s.apng.png"
-          alt="Top and right side rotation"
-        >
+        <div class="sequence-item">
+          <img
+            class="skin-sequence"
+            src="assets/images/rotations/rotate_top_rightside_alpha_60fps_hold3s.apng.png"
+            alt="Top and right side rotation"
+          >
+        </div>
       </div>
 
       <div class="sequence-row">
-        <img
-          class="skin-sequence player-sequence"
-          src="assets/images/visualizer-1/play_first_hatch_slimebeach_no_np_alpha_10s_10fps.apng.png"
-          alt="Visualizer 1 sequence"
-        >
+        <div class="sequence-item">
+          <img
+            class="skin-sequence player-sequence"
+            src="assets/images/visualizer 1/play_first_hatch_slimebeach_no_np_alpha_10s_10fps.apng.png"
+            alt="Visualizer 1 sequence"
+          >
+        </div>
 
-        <video
-          class="skin-sequence pbj-sequence"
-          src="assets/images/pbj_sequence/pbjvisualizer_circle_overlay_cleanbody_alpha_30fps.webm"
-          autoplay
-          loop
-          muted
-          playsinline
-        ></video>
+        <div class="sequence-item">
+          <video
+            class="skin-sequence pbj-sequence"
+            src="assets/images/pbj_sequence/pbjvisualizer_circle_overlay_cleanbody_alpha_30fps.webm"
+            autoplay
+            loop
+            muted
+            playsinline
+          ></video>
+        </div>
 
-        <img
-          class="skin-sequence player-sequence"
-          src="assets/images/visualizer-4-cd-spin/cdspin_visualizer4_stable_loop_with_window_overlays_no_np_alpha_60fps.apng.png"
-          alt="Disc spin visualizer sequence"
-        >
+        <div class="sequence-item">
+          <img
+            class="skin-sequence player-sequence"
+            src="assets/images/visualizer 4 cd spin/cdspin_visualizer4_stable_loop_with_window_overlays_no_np_alpha_60fps.apng.png"
+            alt="Disc spin visualizer sequence"
+          >
+        </div>
       </div>
 
       <div class="sequence-row">
-        <img
-          class="skin-sequence player-sequence"
-          src="assets/images/trackslimes/trackslimes_expand_hold5s_retract_hold5s_no_np_alpha_20fps.apng.png"
-          alt="BB Trackslimes sequence"
-        >
+        <div class="sequence-item">
+          <img
+            class="skin-sequence player-sequence"
+            src="assets/images/trackslimes/trackslimes_expand_hold5s_retract_hold5s_no_np_alpha_20fps.apng.png"
+            alt="BB Trackslimes sequence"
+          >
+        </div>
 
-        <img
-          class="skin-sequence player-sequence"
-          src="assets/images/bbnetworkring/bbnetworkring_expand_spin5s_retract_hold5s_slimespread_no_np_alpha_20fps.apng.png"
-          alt="BB Network Ring sequence"
-        >
+        <div class="sequence-item">
+          <img
+            class="skin-sequence player-sequence"
+            src="assets/images/bbnetworkring/bbnetworkring_expand_spin5s_retract_hold5s_slimespread_no_np_alpha_20fps.apng.png"
+            alt="BB Network Ring sequence"
+          >
+        </div>
       </div>
 
     </section>
   </main>
+
+  <script>
+    (function(){
+      const PASS = 'BIGSLIME';
+      const entry = prompt('Enter password to access this page:');
+      if (entry !== PASS) {
+        document.body.innerHTML =
+          '<h2 style="text-align:center; margin-top:40vh;">Access denied.</h2>';
+      }
+    })();
+  </script>
 </body>
 </html>
