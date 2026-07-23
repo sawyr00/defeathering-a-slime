@@ -23,27 +23,27 @@
     .sequence-page {
       min-height: 100svh;
       box-sizing: border-box;
-      padding: 42px 22px 28px;
+      padding: 34px 22px 34px;
     }
 
     .sequence-stack {
+      --slot: min(360px, 30vw);
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 4px;
+      gap: 34px;
     }
 
     .sequence-row {
-      display: flex;
-      justify-content: flex-start;
-      align-items: flex-start;
-      gap: 18px;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, var(--slot));
+      column-gap: 42px;
+      align-items: center;
     }
 
     .sequence-item {
-      width: min(540px, 30vw);
-      height: min(540px, 30vw);
+      width: var(--slot);
+      height: var(--slot);
       display: grid;
       place-items: center;
       overflow: visible;
@@ -51,42 +51,46 @@
 
     .skin-sequence {
       width: 100%;
-      height: auto;
+      height: 100%;
+      object-fit: contain;
       display: block;
     }
 
     .player-sequence {
-      width: 132%;
-      max-width: none;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transform: scale(1.18);
+      transform-origin: center;
     }
 
     .pbj-sequence {
-      width: 155%;
-      max-width: none;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
+      transform: translate(8px, -6px) scale(1.46);
+      transform-origin: center;
     }
 
-    @media (max-width: 700px) {
-      .sequence-page {
-        padding: 58px 14px 24px;
-      }
-
+    @media (max-width: 900px) {
       .sequence-stack {
-        gap: 8px;
+        --slot: min(320px, calc(100vw - 32px));
+        gap: 28px;
       }
 
       .sequence-row {
-        gap: 12px;
+        grid-template-columns: 1fr;
+        row-gap: 28px;
       }
 
       .sequence-item {
-        width: min(320px, calc(100vw - 28px));
-        height: min(320px, calc(100vw - 28px));
+        width: var(--slot);
+        height: var(--slot);
       }
 
       .player-sequence,
       .pbj-sequence {
-        width: 100%;
+        transform: none;
       }
     }
   </style>
@@ -167,6 +171,8 @@
             alt="BB Network Ring sequence"
           >
         </div>
+
+        <div class="sequence-item"></div>
       </div>
 
     </section>
