@@ -56,6 +56,12 @@
       display: block;
     }
 
+    .sequence-picture {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
     .player-sequence {
       width: 100%;
       height: 100%;
@@ -68,19 +74,23 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      transform: translate(0px, -18px) scale(1.6);
+      transform: translate(0px, calc(var(--slot) * -0.05)) scale(1.6);
       transform-origin: center;
     }
 
     @media (max-width: 900px) {
+      .sequence-page {
+        padding: 18px 12px 28px;
+      }
+
       .sequence-stack {
-        --slot: min(320px, calc(100vw - 32px));
-        gap: 28px;
+        --slot: min(260px, calc((100vw - 34px) / 3));
+        gap: 22px;
       }
 
       .sequence-row {
-        grid-template-columns: 1fr;
-        row-gap: 28px;
+        grid-template-columns: repeat(3, var(--slot));
+        column-gap: 5px;
       }
 
       .sequence-item {
@@ -88,30 +98,122 @@
         height: var(--slot);
       }
 
-      .player-sequence,
-      .pbj-sequence {
-        transform: none;
+      .sequence-stack h2 {
+        font-size: clamp(12px, 3.6vw, 18px) !important;
       }
     }
-.header-player-row {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
+    .header-title-image {
+      width: min(720px, calc(100vw - 44px));
+      height: auto;
+      display: block;
+    }
 
-.header-front-image {
-  width: min(420px, 70vw);
-  height: auto;
-  display: block;
-}
+    .header-player-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
 
-.download-link {
-  color: #fff;
-  font-family: "Courier New", Courier, monospace;
-  font-size: 18px;
-  font-weight: bold;
-  text-decoration: underline;
-}
+    .header-front-picture {
+      width: min(520px, calc(100vw - 44px));
+      display: block;
+      flex: 0 1 auto;
+    }
+
+    .header-front-image {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .header-copy {
+      max-width: 780px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .header-description {
+      margin: 0 0 48px 0;
+      color: #fff;
+      font-weight: bold;
+      max-width: 420px;
+    }
+
+    .header-info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 34px;
+      flex-wrap: wrap;
+    }
+
+    .header-info-column {
+      max-width: 360px;
+    }
+
+    .download-link {
+      color: #66A6FF;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 18px;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 900px) {
+      .summer-player-header {
+        gap: 8px !important;
+        margin-bottom: 18px !important;
+      }
+
+      .header-title-image {
+        width: min(560px, calc(100vw - 24px));
+      }
+
+      .header-player-row {
+        align-items: flex-start;
+        gap: clamp(8px, 2.8vw, 24px);
+        flex-wrap: nowrap;
+      }
+
+      .header-front-picture {
+        width: min(34vw, 190px);
+        flex: 0 0 auto;
+      }
+
+      .header-copy {
+        max-width: none;
+        min-width: 0;
+        flex: 1 1 auto;
+        font-size: clamp(7px, 2.15vw, 12px);
+        line-height: 1.25;
+      }
+
+      .header-description {
+        max-width: none;
+        margin-bottom: clamp(12px, 5vw, 48px);
+      }
+
+      .header-info-row {
+        gap: clamp(8px, 2.2vw, 34px);
+        flex-wrap: nowrap;
+      }
+
+      .header-info-column {
+        max-width: none;
+        min-width: 0;
+        flex: 1 1 0;
+      }
+
+      .header-info-column p {
+        margin-bottom: 8px !important;
+      }
+
+      .download-link {
+        font-size: clamp(9px, 2.6vw, 18px);
+        overflow-wrap: anywhere;
+      }
+    }
 
   </style>
 </head>
@@ -123,24 +225,30 @@
       style="display:flex; flex-direction:column; align-items:flex-start; gap:10px; margin:0 0 26px 0;"
     >
        <img
+        class="header-title-image"
         src="assets/images/Beach-Slime-Player-Text-image.png"
         alt="Beach Slime Player"
-        style="width:min(720px, calc(100vw - 44px)); height:auto; display:block;"
       >
 
-<div style="display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
-  <img
-    src="assets/images/front angle L.png"
-    alt="Beach Slime Player front angle"
-    style="width:min(520px, calc(100vw - 44px)); height:auto; display:block;"
-  >
+<div class="header-player-row">
+  <picture class="header-front-picture">
+    <source
+      media="(max-width: 900px)"
+      srcset="assets/images/mobile/front-angle-L_480w.png"
+    >
+    <img
+      class="header-front-image"
+      src="assets/images/front angle L.png"
+      alt="Beach Slime Player front angle"
+    >
+  </picture>
 
-  <div style="max-width:780px; font-family:'Courier New', Courier, monospace; font-size:12px; line-height:1.35;">
-<p style="margin:0 0 48px 0; color:#fff; font-weight:bold; max-width:420px;">      The Beach Slime media player skin. Disfiguring The Goddess's Big Slime Summer album artwork illustrated by Karmavoid is actualized into a 3D visual piece with integrated music player functions. With multiple functions including rotations, visualizers, skin modes, and other bonus features, this player incorporates the brutality of DTG's themed compilation of tracks combined with a fun, laid-back, enjoyable summer beach vacation. This is a standalone player and not a "skin" in the traditional sense, as it cannot be applied towards WMP or Winamp applications.
+  <div class="header-copy">
+<p class="header-description">      The Beach Slime media player skin. Disfiguring The Goddess's Big Slime Summer album artwork illustrated by Karmavoid is actualized into a 3D visual piece with integrated music player functions. With multiple functions including rotations, visualizers, skin modes, and other bonus features, this player incorporates the brutality of DTG's themed compilation of tracks combined with a fun, laid-back, enjoyable summer beach vacation. This is a standalone player and not a "skin" in the traditional sense, as it cannot be applied towards WMP or Winamp applications.
     </p>
 
-    <div style="display:flex; align-items:flex-start; gap:34px; flex-wrap:wrap;">
-      <div style="max-width:360px;">
+    <div class="header-info-row">
+      <div class="header-info-column">
         <p style="margin:0 0 12px 0; color:#fff; font-weight:bold;">
           BEACH SLIME PLAYER is a Windows desktop music-player skin built in Unreal Engine. It runs as a downloadable Windows application.
         </p>
@@ -150,16 +258,16 @@
         </p>
 
         <a
+          class="download-link"
           href="https://drive.google.com/file/d/1591VvFrZbxQXV9Emm4pdxBtvTZ_HKwdn/view?usp=drive_link"
           target="_blank"
           rel="noopener"
-          style="color:#66A6FF; font-family:'Courier New', Courier, monospace; font-size:18px; font-weight:bold; text-decoration:underline;"
         >
           download (windows)
         </a>
       </div>
 
-      <div style="max-width:360px;">
+      <div class="header-info-column">
         <p style="margin:0 0 12px 0; color:#fff; font-weight:bold;">
           ANDROID VERSION
         </p>
@@ -170,12 +278,12 @@ Disclaimer: It's a couple GB's in size, so it might take 5 minutes or so to down
         </p>
 
         <a
-          href="https://drive.google.com/file/d/1RthwNidrsPwefF-FluIyduU4SfdygIJm/view?usp=sharing"
+          class="download-link"
+          href=" "
           target="_blank"
           rel="noopener"
-          style="color:#66A6FF; font-family:'Courier New', Courier, monospace; font-size:18px; font-weight:bold; text-decoration:underline;"
         >
-          download (android)
+          coming soon
         </a>
       </div>
     </div>
@@ -190,27 +298,51 @@ Disclaimer: It's a couple GB's in size, so it might take 5 minutes or so to down
 
   <div class="sequence-row">
     <div class="sequence-item">
-      <img
-        class="skin-sequence"
-        src="assets/images/rotations/rotate_counterclockwise_90_alpha_60fps_hold3s.apng.png"
-        alt="Front to left rotation"
-      >
+      <picture class="sequence-picture">
+        <source
+          media="(max-width: 900px)"
+          srcset="assets/images/mobile-sequences/rotate_counterclockwise_90_alpha_60fps_hold3s.apng_480w.png"
+        >
+        <img
+          class="skin-sequence"
+          src="assets/images/rotations/rotate_counterclockwise_90_alpha_60fps_hold3s.apng.png"
+          alt="Front to left rotation"
+          loading="lazy"
+          decoding="async"
+        >
+      </picture>
     </div>
 
     <div class="sequence-item">
-      <img
-        class="skin-sequence"
-        src="assets/images/rotations/rotate_counterclockwise_90_plus_90_plus_90_plus_90_alpha_60fps_hold3s.apng.png"
-        alt="Full counterclockwise rotation"
-      >
+      <picture class="sequence-picture">
+        <source
+          media="(max-width: 900px)"
+          srcset="assets/images/mobile-sequences/rotate_counterclockwise_90_plus_90_plus_90_plus_90_alpha_60fps_hold3s.apng_480w.png"
+        >
+        <img
+          class="skin-sequence"
+          src="assets/images/rotations/rotate_counterclockwise_90_plus_90_plus_90_plus_90_alpha_60fps_hold3s.apng.png"
+          alt="Full counterclockwise rotation"
+          loading="lazy"
+          decoding="async"
+        >
+      </picture>
     </div>
 
     <div class="sequence-item">
-      <img
-        class="skin-sequence"
-        src="assets/images/rotations/rotate_top_rightside_alpha_60fps_hold3s.apng.png"
-        alt="Top and right side rotation"
-      >
+      <picture class="sequence-picture">
+        <source
+          media="(max-width: 900px)"
+          srcset="assets/images/mobile-sequences/rotate_top_rightside_alpha_60fps_hold3s.apng_480w.png"
+        >
+        <img
+          class="skin-sequence"
+          src="assets/images/rotations/rotate_top_rightside_alpha_60fps_hold3s.apng.png"
+          alt="Top and right side rotation"
+          loading="lazy"
+          decoding="async"
+        >
+      </picture>
     </div>
   </div>
 
@@ -220,11 +352,19 @@ Disclaimer: It's a couple GB's in size, so it might take 5 minutes or so to down
 
   <div class="sequence-row">
     <div class="sequence-item">
-      <img
-        class="skin-sequence player-sequence"
-        src="assets/images/visualizer 1/play_first_hatch_slimebeach_no_np_alpha_10s_10fps.apng.png"
-        alt="Visualizer 1 sequence"
-      >
+      <picture class="sequence-picture">
+        <source
+          media="(max-width: 900px)"
+          srcset="assets/images/mobile-sequences/play_first_hatch_slimebeach_no_np_alpha_10s_10fps.apng_480w.png"
+        >
+        <img
+          class="skin-sequence player-sequence"
+          src="assets/images/visualizer 1/play_first_hatch_slimebeach_no_np_alpha_10s_10fps.apng.png"
+          alt="Visualizer 1 sequence"
+          loading="lazy"
+          decoding="async"
+        >
+      </picture>
     </div>
 
     <div class="sequence-item">
@@ -239,11 +379,19 @@ Disclaimer: It's a couple GB's in size, so it might take 5 minutes or so to down
     </div>
 
     <div class="sequence-item">
-      <img
-        class="skin-sequence player-sequence"
-        src="assets/images/visualizer 4 cd spin/cdspin_visualizer4_stable_loop_with_window_overlays_no_np_alpha_60fps.apng.png"
-        alt="Disc spin visualizer sequence"
-      >
+      <picture class="sequence-picture">
+        <source
+          media="(max-width: 900px)"
+          srcset="assets/images/mobile-sequences/cdspin_visualizer4_stable_loop_with_window_overlays_no_np_alpha_60fps.apng_480w.png"
+        >
+        <img
+          class="skin-sequence player-sequence"
+          src="assets/images/visualizer 4 cd spin/cdspin_visualizer4_stable_loop_with_window_overlays_no_np_alpha_60fps.apng.png"
+          alt="Disc spin visualizer sequence"
+          loading="lazy"
+          decoding="async"
+        >
+      </picture>
     </div>
   </div>
 
@@ -253,19 +401,35 @@ Disclaimer: It's a couple GB's in size, so it might take 5 minutes or so to down
 
   <div class="sequence-row">
     <div class="sequence-item">
-      <img
-        class="skin-sequence player-sequence"
-        src="assets/images/trackslimes/trackslimes_expand_hold5s_retract_hold5s_no_np_alpha_20fps.apng.png"
-        alt="BB Trackslimes sequence"
-      >
+      <picture class="sequence-picture">
+        <source
+          media="(max-width: 900px)"
+          srcset="assets/images/mobile-sequences/trackslimes_expand_hold5s_retract_hold5s_no_np_alpha_20fps.apng_480w.png"
+        >
+        <img
+          class="skin-sequence player-sequence"
+          src="assets/images/trackslimes/trackslimes_expand_hold5s_retract_hold5s_no_np_alpha_20fps.apng.png"
+          alt="BB Trackslimes sequence"
+          loading="lazy"
+          decoding="async"
+        >
+      </picture>
     </div>
 
     <div class="sequence-item">
-      <img
-        class="skin-sequence player-sequence"
-        src="assets/images/bbnetworkring/bbnetworkring_expand_spin5s_retract_hold5s_slimespread_no_np_alpha_20fps.apng.png"
-        alt="BB Network Ring sequence"
-      >
+      <picture class="sequence-picture">
+        <source
+          media="(max-width: 900px)"
+          srcset="assets/images/mobile-sequences/bbnetworkring_expand_spin5s_retract_hold5s_slimespread_no_np_alpha_20fps.apng_480w.png"
+        >
+        <img
+          class="skin-sequence player-sequence"
+          src="assets/images/bbnetworkring/bbnetworkring_expand_spin5s_retract_hold5s_slimespread_no_np_alpha_20fps.apng.png"
+          alt="BB Network Ring sequence"
+          loading="lazy"
+          decoding="async"
+        >
+      </picture>
     </div>
 
     <div class="sequence-item"></div>
