@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>DTGSLIME - Big Summer Subpage</title>
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: #000;
+      color: #fff;
+      font-family: "Courier New", Courier, monospace;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    .subpage-shell {
+      min-height: 100svh;
+      box-sizing: border-box;
+      padding: 34px 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 28px;
+    }
+
+    .subpage-title {
+      margin: 0;
+      color: #fff;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 0;
+    }
+
+    .subpage-link {
+      color: #66A6FF;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 18px;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 900px) {
+      .subpage-shell {
+        padding: 18px 12px 28px;
+        gap: 22px;
+      }
+
+      .subpage-title,
+      .subpage-link {
+        font-size: clamp(12px, 3.6vw, 18px);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="subpage-shell">
+    <h1 class="subpage-title">fresh subpage</h1>
+
+    <a class="subpage-link" href="BIGSUMMERPLAYER.html">
+      back to beach slime player
+    </a>
+
+    <a href="index.html" aria-label="return to home" title="return to home">
+      <img
+        src="assets/images/sg-enhanced-[white].png"
+        alt="return to home"
+        style="width:min(110px, 32vw); height:auto; display:block;"
+      >
+    </a>
+  </main>
+
+  <script>
+    (function(){
+      const PASS = 'BIGSLIME';
+      const entry = prompt('Enter password to access this page:');
+      if (entry !== PASS) {
+        document.body.innerHTML =
+          '<h2 style="text-align:center; margin-top:40vh;">Access denied.</h2>';
+      }
+    })();
+  </script>
+</body>
+</html>
