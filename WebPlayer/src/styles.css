@@ -1,0 +1,337 @@
+* {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: "Credit Block Extra Condensed";
+  src: url("../Content/fonts/Credit Block extra condensed.otf") format("opentype");
+  font-display: block;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: #000;
+}
+
+body {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+#app {
+  width: min(90vw, 90vh);
+  max-width: 1260px;
+  aspect-ratio: 1;
+}
+
+.slimeball-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.slimeball-stage {
+  position: relative;
+  overflow: visible;
+  transform-origin: top left;
+  transform: scale(var(--stage-scale, 1));
+}
+
+.slimeball-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.player-layer {
+  position: absolute;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+.hidden {
+  visibility: hidden !important;
+}
+
+.slimeball-stage.hatch-animating .hatch-static {
+  visibility: hidden !important;
+}
+
+.front-skin,
+.side-static,
+.hatch-window,
+.hatch-static,
+.hatch-animation,
+.shared-button-static,
+.shared-button-animation,
+.play-pause-static,
+.play-pause-animation,
+.trackslimes,
+.trackslimes-animation,
+.bb-network-ring-animation,
+.skeleton-arm-animation,
+.visualizer-backing-image,
+.visualizer-crossfade-image,
+.visualizer-pbj-canvas,
+.visualizer-overlay {
+  object-fit: contain;
+}
+
+.hatch-animation,
+.hatch-window,
+.shared-button-animation,
+.play-pause-animation,
+.trackslimes-animation,
+.bb-network-ring-animation,
+.skeleton-arm-animation,
+.rotation-animation,
+.side-static,
+.trackslimes,
+.visualizer-mask,
+.visualizer-backing-image,
+.visualizer-crossfade-image,
+.visualizer-pbj-canvas,
+.visualizer-overlay {
+  visibility: hidden;
+}
+
+.hatch-animation.playing,
+.hatch-window.visible,
+.shared-button-animation.playing,
+.play-pause-animation.playing,
+.trackslimes-animation.playing,
+.bb-network-ring-animation.playing,
+.bb-network-ring-animation.looping,
+.skeleton-arm-animation.playing,
+.rotation-animation.playing,
+.side-static.visible,
+.trackslimes.visible,
+.visualizer-mask.visible,
+.visualizer-backing-image.visible,
+.visualizer-crossfade-image.visible,
+.visualizer-pbj-canvas.visible,
+.visualizer-overlay.visible {
+  visibility: visible;
+}
+
+.slimeball-stage.rotating .front-skin,
+.slimeball-stage.rotating .hatch-window,
+.slimeball-stage.rotating .hatch-static,
+.slimeball-stage.rotating .hatch-animation,
+.slimeball-stage.rotating .shared-button-static,
+.slimeball-stage.rotating .shared-button-animation,
+.slimeball-stage.rotating .play-pause-static,
+.slimeball-stage.rotating .play-pause-animation,
+.slimeball-stage.rotating .trackslimes,
+.slimeball-stage.rotating .trackslimes-animation,
+.slimeball-stage.rotating .bb-network-ring-animation,
+.slimeball-stage.rotating .skeleton-arm-animation,
+.slimeball-stage.rotating .np-skin-root,
+.slimeball-stage.rotating .visualizer-mask,
+.slimeball-stage.rotating .visualizer-crossfade-image,
+.slimeball-stage.rotating .visualizer-pbj-canvas,
+.slimeball-stage.rotating .visualizer-overlay,
+.slimeball-stage[data-side="left"] .front-skin,
+.slimeball-stage[data-side="left"] .hatch-window,
+.slimeball-stage[data-side="left"] .hatch-static,
+.slimeball-stage[data-side="left"] .hatch-animation,
+.slimeball-stage[data-side="left"] .shared-button-static,
+.slimeball-stage[data-side="left"] .shared-button-animation,
+.slimeball-stage[data-side="left"] .play-pause-static,
+.slimeball-stage[data-side="left"] .play-pause-animation,
+.slimeball-stage[data-side="left"] .trackslimes,
+.slimeball-stage[data-side="left"] .trackslimes-animation,
+.slimeball-stage[data-side="left"] .bb-network-ring-animation,
+.slimeball-stage[data-side="left"] .skeleton-arm-animation,
+.slimeball-stage[data-side="left"] .np-skin-root,
+.slimeball-stage[data-side="left"] .visualizer-mask,
+.slimeball-stage[data-side="left"] .visualizer-crossfade-image,
+.slimeball-stage[data-side="left"] .visualizer-pbj-canvas,
+.slimeball-stage[data-side="left"] .visualizer-overlay,
+.slimeball-stage[data-side="right"] .front-skin,
+.slimeball-stage[data-side="right"] .hatch-window,
+.slimeball-stage[data-side="right"] .hatch-static,
+.slimeball-stage[data-side="right"] .hatch-animation,
+.slimeball-stage[data-side="right"] .shared-button-static,
+.slimeball-stage[data-side="right"] .shared-button-animation,
+.slimeball-stage[data-side="right"] .play-pause-static,
+.slimeball-stage[data-side="right"] .play-pause-animation,
+.slimeball-stage[data-side="right"] .trackslimes,
+.slimeball-stage[data-side="right"] .trackslimes-animation,
+.slimeball-stage[data-side="right"] .bb-network-ring-animation,
+.slimeball-stage[data-side="right"] .skeleton-arm-animation,
+.slimeball-stage[data-side="right"] .np-skin-root,
+.slimeball-stage[data-side="right"] .visualizer-mask,
+.slimeball-stage[data-side="right"] .visualizer-crossfade-image,
+.slimeball-stage[data-side="right"] .visualizer-pbj-canvas,
+.slimeball-stage[data-side="right"] .visualizer-overlay,
+.slimeball-stage[data-side="top"] .front-skin,
+.slimeball-stage[data-side="top"] .hatch-window,
+.slimeball-stage[data-side="top"] .hatch-static,
+.slimeball-stage[data-side="top"] .hatch-animation,
+.slimeball-stage[data-side="top"] .shared-button-static,
+.slimeball-stage[data-side="top"] .shared-button-animation,
+.slimeball-stage[data-side="top"] .play-pause-static,
+.slimeball-stage[data-side="top"] .play-pause-animation,
+.slimeball-stage[data-side="top"] .trackslimes,
+.slimeball-stage[data-side="top"] .trackslimes-animation,
+.slimeball-stage[data-side="top"] .bb-network-ring-animation,
+.slimeball-stage[data-side="top"] .skeleton-arm-animation,
+.slimeball-stage[data-side="top"] .np-skin-root,
+.slimeball-stage[data-side="top"] .visualizer-mask,
+.slimeball-stage[data-side="top"] .visualizer-crossfade-image,
+.slimeball-stage[data-side="top"] .visualizer-pbj-canvas,
+.slimeball-stage[data-side="top"] .visualizer-overlay {
+  visibility: hidden;
+}
+
+.slimeball-stage.rotating .side-static {
+  visibility: hidden;
+}
+
+.slimeball-stage[data-side="back"] .front-skin,
+.slimeball-stage[data-side="back"] .hatch-window,
+.slimeball-stage[data-side="back"] .hatch-static,
+.slimeball-stage[data-side="back"] .hatch-animation,
+.slimeball-stage[data-side="back"] .shared-button-static,
+.slimeball-stage[data-side="back"] .shared-button-animation,
+.slimeball-stage[data-side="back"] .play-pause-static,
+.slimeball-stage[data-side="back"] .play-pause-animation,
+.slimeball-stage[data-side="back"] .trackslimes,
+.slimeball-stage[data-side="back"] .trackslimes-animation,
+.slimeball-stage[data-side="back"] .bb-network-ring-animation,
+.slimeball-stage[data-side="back"] .skeleton-arm-animation,
+.slimeball-stage[data-side="back"] .np-skin-root,
+.slimeball-stage[data-side="back"] .visualizer-mask,
+.slimeball-stage[data-side="back"] .visualizer-crossfade-image,
+.slimeball-stage[data-side="back"] .visualizer-pbj-canvas,
+.slimeball-stage[data-side="back"] .visualizer-overlay {
+  visibility: hidden;
+}
+
+.slimeball-stage[data-side="back"] .skeleton-arm-animation.playing {
+  visibility: visible;
+}
+
+.np-skin-root {
+  transform-origin: center;
+  visibility: hidden;
+  transform: translateY(0);
+}
+
+.np-skin-image {
+  display: block;
+  object-fit: contain;
+  position: absolute;
+  z-index: 2;
+}
+
+.np-skin-root.visible {
+  visibility: visible;
+}
+
+.visualizer-mask {
+  overflow: hidden;
+  background: transparent;
+}
+
+.visualizer-image,
+.visualizer-backing-image,
+.visualizer-crossfade-image,
+.visualizer-pbj-canvas {
+  position: absolute;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+}
+
+.np-track-text-mask {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 999px;
+  clip-path: inset(0 round 999px);
+  contain: paint;
+  background: #000;
+  pointer-events: none;
+}
+
+.np-track-text-background {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  z-index: 0;
+}
+
+.now-playing-text {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  min-width: max-content;
+  white-space: nowrap;
+  color: rgb(255, 6, 40);
+  font-family: "Credit Block Extra Condensed", "Arial Narrow", Arial, sans-serif;
+  font-size: 41.25px;
+  line-height: 1;
+  transform: translate(70px, -50%) scale(0.35, 0.4);
+  transform-origin: left center;
+  text-shadow:
+    0 0 3px rgba(255, 6, 40, 0.36),
+    0 0 9px rgba(255, 6, 40, 0.36);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.now-playing-text-glow {
+  filter: blur(1px);
+  opacity: 0.34;
+  z-index: 1;
+}
+
+.np-track-window {
+  position: absolute;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.np-track-title-copy {
+  display: inline-block;
+}
+
+.np-track-title-copy + .np-track-title-copy {
+  margin-left: 126px;
+}
+
+.hit-surface {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.startup-fade {
+  background: #000;
+  opacity: 1;
+  transition: opacity 900ms ease-in;
+}
+
+.startup-fade.startup-fade-complete {
+  opacity: 0;
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  #app {
+    width: 90vw;
+  }
+}
