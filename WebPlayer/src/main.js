@@ -229,6 +229,37 @@ function preloadImage(relativePath) {
   return promise;
 }
 
+async function waitForImageElement(image) {
+  if (!(image instanceof HTMLImageElement) || !image.src) return;
+
+  if (!image.complete) {
+    await new Promise((resolve) => {
+      image.addEventListener("load", resolve, { once: true });
+      image.addEventListener("error", resolve, { once: true });
+    });
+  }
+
+  if (!image.naturalWidth || !image.decode) return;
+  try {
+    await image.decode();
+  } catch {}
+}
+
+async function revealInitialComposition() {
+  const initialVisibleLayers = [
+    runtime.layers.frontSkin,
+    runtime.layers.hatchStatic,
+    runtime.layers.sharedButtonStatic,
+    runtime.layers.playPauseStatic
+  ];
+
+  await Promise.all(initialVisibleLayers.map(waitForImageElement));
+  await nextAnimationFrame();
+  runtime.layers.startupFade.classList.add("startup-fade-complete");
+  initializeHitMasks();
+  preloadFrontSideSequences();
+}
+
 function drawFrame(layer, image) {
   if (layer instanceof HTMLCanvasElement) {
     const context = layer.getContext("2d");
@@ -522,10 +553,8 @@ function buildPlayerShell() {
   app.replaceChildren(shell);
   syncStageScale(shell, stage);
   runtime.layers.hitSurface.addEventListener("click", handlePlayerClick);
-  initializeHitMasks();
-  requestAnimationFrame(() => runtime.layers.startupFade.classList.add("startup-fade-complete"));
   renderState();
-  preloadFrontSideSequences();
+  revealInitialComposition();
   bindStartupAudioRetry();
   requestStartupAudio();
 }
