@@ -8,7 +8,7 @@ from PIL import Image
 WEB_PLAYER_ROOT = Path(__file__).resolve().parent.parent
 CONTENT_ROOT = WEB_PLAYER_ROOT / "Content"
 OUTPUT_ROOT = CONTENT_ROOT / "WebPlayerOptimized" / "Mobile"
-TARGET_SIZE = 540
+TARGET_SIZE = 720
 QUALITY = 86
 SOURCE_ROOTS = ("Images/static", "buttons", "hatch", "rotation", "Sequences")
 EXCLUDED_PREFIXES = ("buttons/masks/", "rotation/rotation click areas/")
@@ -43,7 +43,7 @@ def convert(source_path):
             "WEBP",
             quality=QUALITY,
             alpha_quality=100,
-            method=6,
+            method=4,
             exact=True,
         )
     return {

@@ -402,9 +402,7 @@ async function warmMobileFirstActions() {
       .map((control) => rotationSequence(playerConfig.rotationTransitions[control.transition], "default"))
   ];
 
-  for (const sequence of firstActions) {
-    await preloadSequence(sequence);
-  }
+  await Promise.all(firstActions.map((sequence) => preloadSequence(sequence)));
 }
 
 function preloadVisualizerDecorationAssets() {
@@ -598,9 +596,32 @@ function buildPlayerShell() {
 
 function syncStageScale(shell, stage) {
   const resize = () => {
+    if (useMobileAssets) {
+      const mobileLayout = mobileAssetConfig.layout || {};
+      const sideInset = mobileLayout.sideInset ?? 10;
+      const topInset = mobileLayout.topInset ?? 10;
+      const npRoot = playerConfig.npSkinRoot;
+      const highestVisibleY = npRoot.y + npRoot.movement.peak.y + npRoot.skinImage.y;
+      const lowestVisibleY = playerConfig.playerAssembly.y + playerConfig.playerAssembly.height;
+      const visibleHeight = lowestVisibleY - highestVisibleY;
+      const widthScale = Math.max(0, shell.clientWidth - sideInset * 2)
+        / playerConfig.playerAssembly.width;
+      const heightScale = Math.max(0, shell.clientHeight - topInset * 2) / visibleHeight;
+      const scale = Math.min(widthScale, heightScale);
+      const stageWidth = playerConfig.stage.width * scale;
+      const offsetX = (shell.clientWidth - stageWidth) / 2;
+      const offsetY = topInset - highestVisibleY * scale;
+      stage.style.setProperty("--stage-scale", String(scale));
+      stage.style.setProperty("--stage-offset-x", `${offsetX}px`);
+      stage.style.setProperty("--stage-offset-y", `${offsetY}px`);
+      return;
+    }
+
     const widthScale = shell.clientWidth / playerConfig.stage.width;
     const heightScale = shell.clientHeight / playerConfig.stage.height;
     stage.style.setProperty("--stage-scale", String(Math.min(widthScale, heightScale)));
+    stage.style.setProperty("--stage-offset-x", "0px");
+    stage.style.setProperty("--stage-offset-y", "0px");
   };
 
   resize();
@@ -2994,7 +3015,8 @@ function startNowPlayingTextScroll() {
 
 function applyNowPlayingTextTransform(layer, x, isGlow) {
   const textConfig = playerConfig.npSkinRoot.trackText;
-  const yOffset = isGlow ? textConfig.glowTranslation.y : 0;
+  const mobileYOffset = useMobileAssets ? (textConfig.mobileTranslationY || 0) : 0;
+  const yOffset = mobileYOffset + (isGlow ? textConfig.glowTranslation.y : 0);
   layer.style.transform = `translate(${x}px, calc(-50% + ${yOffset}px)) scale(${textConfig.textScale.x}, ${textConfig.textScale.y})`;
 }
 
