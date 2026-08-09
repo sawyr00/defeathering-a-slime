@@ -369,9 +369,12 @@ body {
   color: rgb(255, 6, 40);
   font-family: "Courier New", Courier, monospace;
   font-size: 13px;
+  font-weight: 700;
   line-height: 1;
   letter-spacing: 0;
   text-align: center;
+  transform: scaleX(0.62);
+  transform-origin: center;
   animation: startup-loading-pulse 1.15s ease-in-out infinite;
 }
 

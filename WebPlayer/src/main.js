@@ -71,6 +71,10 @@ const runtime = {
   audioAnalyser: null,
   audioAnalysisSilenceGain: null,
   audioFrequencyData: null,
+  effectsAudioContext: null,
+  oneShotAudioBuffers: new Map(),
+  oneShotAudioFallbacks: new Map(),
+  oneShotAudioPreloadPromise: null,
   blackAndWhiteStaticOverlayFrameIndex: 0,
   blackAndWhiteStaticOverlayFrameAccumulator: 0,
   blackAndWhiteStaticOverlayLastFrameTime: 0,
@@ -85,6 +89,7 @@ const runtime = {
   sequencePreloadPromises: new Map(),
   mobileAssetPrefetchPromise: null,
   startupLoadingProgress: 0,
+  playerReady: false,
   npHoverTimer: null,
   npAnimationTimers: new Set(),
   npTransition: null,
@@ -275,14 +280,15 @@ async function revealInitialComposition() {
   ];
 
   const initialImagesReady = Promise.all(initialVisibleLayers.map(waitForImageElement));
+  const oneShotAudioReady = preloadOneShotAudioBuffers();
   if (useMobileAssets) {
     await Promise.all([initialImagesReady, prefetchMobileAssetLibrary()]);
     updateStartupLoading(0.92, "PREPARING");
-    await Promise.all([initializeHitMasks(), preloadFrontSideSequences()]);
+    await Promise.all([initializeHitMasks(), preloadFrontSideSequences(), oneShotAudioReady]);
   } else {
     await initialImagesReady;
     updateStartupLoading(0.7, "PREPARING");
-    await Promise.all([initializeHitMasks(), preloadFrontSideSequences()]);
+    await Promise.all([initializeHitMasks(), preloadFrontSideSequences(), oneShotAudioReady]);
   }
 
   updateStartupLoading(0.98, "PREPARING");
@@ -291,6 +297,11 @@ async function revealInitialComposition() {
   runtime.layers.startupFade.classList.add("startup-fade-immediate");
   runtime.layers.startupLoader.classList.add("startup-loader-complete");
   runtime.layers.startupLoader.setAttribute("aria-hidden", "true");
+  window.setTimeout(() => {
+    runtime.playerReady = true;
+    bindStartupAudioRetry();
+    requestStartupAudio();
+  }, 400);
 }
 
 function prefetchMobileAssetLibrary() {
@@ -452,13 +463,21 @@ async function preloadFrontSideSequences() {
 
   const criticalPreloads = criticalSequences.map((sequence) => preloadSequence(sequence));
   const defaultRingLoopPreload = preloadSequence(defaultRingLoopSequence);
+  const sideStaticPreloads = Object.values(playerConfig.layers.sides)
+    .flatMap((side) => Object.values(side))
+    .map((source) => preloadImage(source));
   preloadVisualizerDecorationAssets();
   if (useMobileAssets) {
-    await Promise.all([...criticalPreloads, defaultRingLoopPreload, warmMobileFirstActions()]);
+    await Promise.all([
+      ...criticalPreloads,
+      ...sideStaticPreloads,
+      defaultRingLoopPreload,
+      warmMobileFirstActions()
+    ]);
     return;
   }
 
-  await Promise.all([...criticalPreloads, defaultRingLoopPreload]);
+  await Promise.all([...criticalPreloads, ...sideStaticPreloads, defaultRingLoopPreload]);
   featureSequences
     .filter((sequence) => sequence.folder === playerConfig.sequences.features.bbNetworkRing.blackAndWhiteFolder)
     .forEach((sequence) => preloadSequence(sequence));
@@ -704,8 +723,6 @@ function buildPlayerShell() {
   runtime.layers.hitSurface.addEventListener("click", handlePlayerClick);
   renderState();
   revealInitialComposition();
-  bindStartupAudioRetry();
-  requestStartupAudio();
 }
 
 function syncStageScale(shell, stage) {
@@ -801,6 +818,7 @@ function loadMask(source) {
 
 function handlePlayerClick(event) {
   if (playerState.isRotating || runtime.inputPending) return;
+  unlockEffectsAudio();
   requestStartupAudio();
   const point = playerAssemblyPointFromEvent(event);
   const buttonHit = runtime.hitMasks.find((hitMask) => !hitMask.control && hitMaskAtPoint(hitMask, point));
@@ -908,6 +926,7 @@ function playerAssemblyPointFromEvent(event) {
 }
 
 function unlockAudio() {
+  unlockEffectsAudio();
   requestStartupAudio();
 }
 
@@ -915,13 +934,17 @@ function bindStartupAudioRetry() {
   if (runtime.startupAudioRetryBound) return;
   runtime.startupAudioRetryBound = true;
 
-  const retryStartupAudio = () => requestStartupAudio();
+  const retryStartupAudio = () => {
+    unlockEffectsAudio();
+    requestStartupAudio();
+  };
   document.addEventListener("pointerdown", retryStartupAudio, { capture: true });
   document.addEventListener("keydown", retryStartupAudio, { capture: true });
   document.addEventListener("touchstart", retryStartupAudio, { capture: true, passive: true });
 }
 
 function requestStartupAudio() {
+  if (!runtime.playerReady) return;
   startBackgroundNoise();
   startBootAudio();
 }
@@ -2491,11 +2514,11 @@ async function extendBBNetworkRing() {
     frames: frameRange(feature.firstFrame, feature.loopStartFrame)
   };
   const loopSequence = bbNetworkRingLoopSequence(feature);
+  playOneShot(playerConfig.audio.bbNetworkRingAppear);
   const [appearImages, loopImages] = await Promise.all([
     preloadSequence(appearSequence),
     preloadSequence(loopSequence)
   ]);
-  playOneShot(playerConfig.audio.bbNetworkRingAppear);
   await animateImageSequence(runtime.layers.bbNetworkRingAnimation, appearSequence, {
     keepLastFrame: true,
     keepVisible: true,
@@ -2514,12 +2537,12 @@ async function retractBBNetworkRing() {
     folder: feature.folder,
     frames: frameRange(`${String(runtime.bbNetworkRingLoopFrameIndex || frameNumber(feature.loopEndFrame)).padStart(4, "0")}.png`, feature.lastFrame)
   };
+  playOneShot(playerConfig.audio.bbNetworkRingRetract);
   const retractImages = await preloadSequence(retractSequence);
   runtime.layers.bbNetworkRingAnimation.classList.add("playing");
   stopBBNetworkRingLoop();
   stopAudio(runtime.beaconSoundAudio);
   stopAudio(runtime.beaconBackgroundAudio);
-  playOneShot(playerConfig.audio.bbNetworkRingRetract);
   await animateImageSequence(runtime.layers.bbNetworkRingAnimation, retractSequence, {
     frameDelayMultiplier: playerConfig.frameRate.bbNetworkRingRetractMultiplier,
     preloadedImages: retractImages
@@ -2957,8 +2980,108 @@ function primeTrackAudioAnalyser() {
   return true;
 }
 
+function oneShotAudioSources() {
+  return [...new Set([
+    playerConfig.audio.bbButton,
+    playerConfig.audio.hatchCloseOpen,
+    playerConfig.audio.hatchOpenOnly,
+    playerConfig.audio.playPauseButton,
+    playerConfig.audio.nextPreviousButton,
+    playerConfig.audio.rotation,
+    playerConfig.audio.trackslimesOpen,
+    playerConfig.audio.trackslimesRetract,
+    playerConfig.audio.bbNetworkRingAppear,
+    playerConfig.audio.bbNetworkRingRetract,
+    playerConfig.audio.skinModeChange
+  ])];
+}
+
+function preloadOneShotAudioBuffers() {
+  if (runtime.oneShotAudioPreloadPromise) return runtime.oneShotAudioPreloadPromise;
+
+  const sources = oneShotAudioSources();
+  sources.forEach((source) => {
+    const audio = new Audio(assetUrl(source));
+    audio.autoplay = false;
+    audio.preload = "auto";
+    audio.playsInline = true;
+    audio.load();
+    runtime.oneShotAudioFallbacks.set(source, audio);
+  });
+
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) {
+    runtime.oneShotAudioPreloadPromise = Promise.resolve();
+    return runtime.oneShotAudioPreloadPromise;
+  }
+
+  try {
+    runtime.effectsAudioContext = new AudioContextClass();
+  } catch {
+    runtime.oneShotAudioPreloadPromise = Promise.resolve();
+    return runtime.oneShotAudioPreloadPromise;
+  }
+
+  runtime.oneShotAudioPreloadPromise = Promise.all(sources.map(async (source) => {
+    try {
+      const response = await fetch(assetUrl(source), { cache: "force-cache" });
+      if (!response.ok) throw new Error(`Could not preload audio: ${source}`);
+      const buffer = await runtime.effectsAudioContext.decodeAudioData(await response.arrayBuffer());
+      runtime.oneShotAudioBuffers.set(source, buffer);
+    } catch (error) {
+      console.warn("A button sound will use streamed playback instead of its low-latency buffer.", error);
+    }
+  }));
+
+  return runtime.oneShotAudioPreloadPromise;
+}
+
+function unlockEffectsAudio() {
+  if (runtime.effectsAudioContext?.state === "suspended") {
+    runtime.effectsAudioContext.resume().catch(() => {});
+  }
+}
+
 function playOneShot(source, volume = 1) {
-  const audio = new Audio(assetUrl(source));
+  const context = runtime.effectsAudioContext;
+  const buffer = runtime.oneShotAudioBuffers.get(source);
+  if (context && buffer) {
+    const playBuffer = () => {
+      const sourceNode = context.createBufferSource();
+      const gainNode = context.createGain();
+      sourceNode.buffer = buffer;
+      gainNode.gain.value = mixedVolume(volume * audioMix.effects);
+      sourceNode.connect(gainNode);
+      gainNode.connect(context.destination);
+      sourceNode.addEventListener("ended", () => {
+        sourceNode.disconnect();
+        gainNode.disconnect();
+      }, { once: true });
+      sourceNode.start(0);
+    };
+
+    if (context.state === "suspended") {
+      context.resume().then(playBuffer).catch(() => playOneShotFallback(source, volume));
+    } else {
+      playBuffer();
+    }
+    return;
+  }
+
+  playOneShotFallback(source, volume);
+}
+
+function playOneShotFallback(source, volume) {
+  let audio = runtime.oneShotAudioFallbacks.get(source);
+  if (!audio) {
+    audio = new Audio(assetUrl(source));
+    audio.preload = "auto";
+    audio.playsInline = true;
+    runtime.oneShotAudioFallbacks.set(source, audio);
+  }
+  try {
+    audio.currentTime = 0;
+  } catch {}
   audio.volume = mixedVolume(volume * audioMix.effects);
   audio.play().catch(() => {});
 }

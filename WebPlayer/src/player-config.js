@@ -1,6 +1,6 @@
 window.SlimeBallPlayerConfig = {
   assetRoot: "./Content",
-  assetVersion: "20260808-mobile-6",
+  assetVersion: "20260808-mobile-7",
   mobileAssets: {
     mediaQuery: "(max-width: 900px)",
     root: "WebPlayerOptimized/Mobile",
