@@ -2379,7 +2379,9 @@ function syncBlackAndWhiteStaticAudio() {
 }
 
 function syncNPSkin() {
-  const shouldBeVisible = playerState.isPlaying && playerState.currentSide === "front";
+  const shouldBeVisible = playerState.isPlaying
+    && playerState.currentSide === "front"
+    && !playerState.isRotating;
   if (shouldBeVisible && (!runtime.npVisible || runtime.npTransition === "out")) {
     animateNPSkinIn();
   } else if (!shouldBeVisible && (runtime.npVisible || runtime.npTransition === "in")) {
