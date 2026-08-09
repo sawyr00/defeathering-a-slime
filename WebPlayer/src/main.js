@@ -1,5 +1,9 @@
 const app = document.querySelector("#app");
 const playerConfig = window.SlimeBallPlayerConfig;
+const mobileAssetConfig = playerConfig.mobileAssets || null;
+const useMobileAssets = Boolean(
+  mobileAssetConfig && window.matchMedia(mobileAssetConfig.mediaQuery).matches
+);
 const audioMix = {
   master: 0.72,
   music: 0.66,
@@ -88,12 +92,26 @@ const runtime = {
   nowPlayingScrollFrame: null,
   nowPlayingScrollToken: 0,
   nowPlayingScrollTitle: "",
-  startupAudioRetryBound: false
+  startupAudioRetryBound: false,
+  inputPending: false
 };
 
+function resolvedAssetPath(relativePath) {
+  const normalized = relativePath.replaceAll("\\", "/");
+  if (!useMobileAssets || !/\.(png|jpg|jpeg)$/i.test(normalized)) return normalized;
+
+  const isIncluded = mobileAssetConfig.sourcePrefixes.some((prefix) => normalized.startsWith(prefix));
+  const isExcluded = mobileAssetConfig.sourceExclusions.some((prefix) => normalized.startsWith(prefix));
+  if (!isIncluded || isExcluded) return normalized;
+
+  const webpPath = normalized.replace(/\.(png|jpg|jpeg)$/i, ".webp");
+  return `${mobileAssetConfig.root}/${webpPath}`;
+}
+
 function assetUrl(relativePath) {
-  const url = encodeURI(`${playerConfig.assetRoot}/${relativePath}`.replaceAll("\\", "/"));
-  if (!playerConfig.assetVersion || !/\.(png|jpg|jpeg|webp)$/i.test(relativePath)) return url;
+  const resolvedPath = resolvedAssetPath(relativePath);
+  const url = encodeURI(`${playerConfig.assetRoot}/${resolvedPath}`.replaceAll("\\", "/"));
+  if (!playerConfig.assetVersion || !/\.(png|jpg|jpeg|webp)$/i.test(resolvedPath)) return url;
   return `${url}?v=${encodeURIComponent(playerConfig.assetVersion)}`;
 }
 
@@ -357,8 +375,13 @@ function preloadFrontSideSequences() {
     ...Object.values(playerConfig.rotationTransitions).map((transition) => rotationSequence(transition, "blackAndWhite"))
   ];
 
-  criticalSequences.forEach((sequence) => preloadSequence(sequence));
+  const criticalPreloads = criticalSequences.map((sequence) => preloadSequence(sequence));
   preloadVisualizerDecorationAssets();
+  if (useMobileAssets) {
+    Promise.all(criticalPreloads).then(() => warmMobileFirstActions());
+    return;
+  }
+
   featureSequences
     .filter((sequence) => sequence.folder === playerConfig.sequences.features.bbNetworkRing.folder
       || sequence.folder === playerConfig.sequences.features.bbNetworkRing.blackAndWhiteFolder)
@@ -369,6 +392,19 @@ function preloadFrontSideSequences() {
     preloadVisualizerFrames("blackAndWhiteStatic");
     preloadVisualizerFrames("blackAndWhiteCartonSpin");
   }, 250);
+}
+
+async function warmMobileFirstActions() {
+  const firstActions = [
+    featureSequence(playerConfig.sequences.features.trackslimes),
+    ...playerConfig.rotationControls
+      .filter((control) => control.from === "front")
+      .map((control) => rotationSequence(playerConfig.rotationTransitions[control.transition], "default"))
+  ];
+
+  for (const sequence of firstActions) {
+    await preloadSequence(sequence);
+  }
 }
 
 function preloadVisualizerDecorationAssets() {
@@ -386,6 +422,7 @@ function preloadVisualizerDecorationAssets() {
 function buildPlayerShell() {
   const shell = document.createElement("section");
   shell.className = "slimeball-shell";
+  shell.dataset.assetMode = useMobileAssets ? "mobile" : "desktop";
 
   const stage = document.createElement("section");
   stage.className = "slimeball-stage";
@@ -627,7 +664,7 @@ function loadMask(source) {
 }
 
 function handlePlayerClick(event) {
-  if (playerState.isRotating) return;
+  if (playerState.isRotating || runtime.inputPending) return;
   requestStartupAudio();
   const point = playerAssemblyPointFromEvent(event);
   const buttonHit = runtime.hitMasks.find((hitMask) => !hitMask.control && hitMaskAtPoint(hitMask, point));
@@ -635,14 +672,36 @@ function handlePlayerClick(event) {
   const buttonHandler = buttonHit ? buttonHit.handler : runtime.hitHandlers[buttonFallbackHitName];
 
   if (buttonHandler) {
-    buttonHandler();
+    dispatchPlayerAction(buttonHandler);
     return;
   }
 
   const rotationHit = runtime.hitMasks.find((hitMask) => hitMask.control && hitMaskAtPoint(hitMask, point));
   const rotationFallbackHitName = rotationHit ? null : fallbackRotationHitNameAtPoint(point);
   const rotationHandler = rotationHit ? rotationHit.handler : runtime.hitHandlers[rotationFallbackHitName];
-  if (rotationHandler) rotationHandler();
+  if (rotationHandler) dispatchPlayerAction(rotationHandler);
+}
+
+function dispatchPlayerAction(handler) {
+  runtime.inputPending = true;
+  let result;
+  try {
+    result = handler();
+  } catch (error) {
+    runtime.inputPending = false;
+    throw error;
+  }
+
+  if (!result || typeof result.then !== "function") {
+    runtime.inputPending = false;
+    return;
+  }
+
+  result
+    .catch((error) => console.error("Player action failed.", error))
+    .finally(() => {
+      runtime.inputPending = false;
+    });
 }
 
 function hitMaskAtPoint(hitMask, point) {
@@ -904,7 +963,7 @@ async function onSkeletonArmButton() {
 }
 
 function onRotationControl(controlId) {
-  rotateByControl(controlId);
+  return rotateByControl(controlId);
 }
 
 function onNotYetWiredButton() {

@@ -1,6 +1,13 @@
 window.SlimeBallPlayerConfig = {
   assetRoot: "./Content",
-  assetVersion: "20260808-layer-handoffs",
+  assetVersion: "20260808-mobile-1",
+  mobileAssets: {
+    mediaQuery: "(max-width: 900px)",
+    root: "WebPlayerOptimized/Mobile",
+    sourcePrefixes: ["Images/static/", "buttons/", "hatch/", "rotation/", "Sequences/"],
+    sourceExclusions: ["buttons/masks/", "rotation/rotation click areas/"],
+    targetSize: 540
+  },
   frameRate: {
     defaultFramesPerSecond: 60,
     blackAndWhiteFramesPerSecond: 10,

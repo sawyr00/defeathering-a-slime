@@ -120,6 +120,18 @@ Object.values(config.sequences.visualizers).forEach((visualizer) => {
   }
 });
 
+const mobileManifestPath = path.join(
+  contentRoot,
+  "WebPlayerOptimized",
+  "Mobile",
+  "mobile-assets-manifest.json"
+);
+if (fs.existsSync(mobileManifestPath)) {
+  const mobileManifest = JSON.parse(fs.readFileSync(mobileManifestPath, "utf8"));
+  mobileManifest.files.forEach((file) => addFile(file.output));
+  addFile("WebPlayerOptimized/Mobile/mobile-assets-manifest.json");
+}
+
 if (missingFiles.length) {
   const uniqueMissing = [...new Set(missingFiles)].sort();
   throw new Error(`Missing ${uniqueMissing.length} required web assets:\n${uniqueMissing.join("\n")}`);

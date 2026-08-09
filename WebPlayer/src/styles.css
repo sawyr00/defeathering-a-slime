@@ -318,6 +318,8 @@ body {
   background: transparent;
   cursor: pointer;
   pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .startup-fade {
@@ -333,5 +335,13 @@ body {
 @media (max-aspect-ratio: 1 / 1) {
   #app {
     width: 90vw;
+  }
+}
+
+@media (max-width: 900px) {
+  body {
+    min-height: 100svh;
+    place-items: start center;
+    padding-top: max(0px, env(safe-area-inset-top));
   }
 }
