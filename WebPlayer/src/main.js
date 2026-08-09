@@ -83,6 +83,7 @@ const runtime = {
   blackAndWhiteTransitionFrame: null,
   imageCache: new Map(),
   sequencePreloadPromises: new Map(),
+  mobileAssetPrefetchPromise: null,
   npHoverTimer: null,
   npAnimationTimers: new Set(),
   npTransition: null,
@@ -271,11 +272,55 @@ async function revealInitialComposition() {
     runtime.layers.playPauseStatic
   ];
 
-  await Promise.all(initialVisibleLayers.map(waitForImageElement));
+  const initialImagesReady = Promise.all(initialVisibleLayers.map(waitForImageElement));
+  if (useMobileAssets) {
+    await Promise.all([initialImagesReady, prefetchMobileAssetLibrary()]);
+    await Promise.all([initializeHitMasks(), preloadFrontSideSequences()]);
+  } else {
+    await initialImagesReady;
+  }
+
   await nextAnimationFrame();
   runtime.layers.startupFade.classList.add("startup-fade-complete");
-  initializeHitMasks();
-  preloadFrontSideSequences();
+  if (!useMobileAssets) {
+    initializeHitMasks();
+    preloadFrontSideSequences();
+  }
+}
+
+function prefetchMobileAssetLibrary() {
+  if (!useMobileAssets) return Promise.resolve();
+  if (runtime.mobileAssetPrefetchPromise) return runtime.mobileAssetPrefetchPromise;
+
+  runtime.mobileAssetPrefetchPromise = (async () => {
+    const manifestUrl = `./content-manifest.json?v=${encodeURIComponent(playerConfig.assetVersion)}`;
+    const response = await fetch(manifestUrl, { cache: "no-cache" });
+    if (!response.ok) throw new Error(`Could not load mobile cache manifest (${response.status}).`);
+    const manifest = await response.json();
+    const mobileRoot = `${mobileAssetConfig.root}/`;
+    const paths = [...new Set(manifest.files.filter((path) => (
+      /\.(png|jpg|jpeg|webp)$/i.test(path)
+      && (
+        path.startsWith(mobileRoot)
+        || path.startsWith("WebPlayerOptimized/Visualizers/")
+        || path.startsWith("buttons/masks/")
+        || path.startsWith("rotation/rotation click areas/")
+      )
+    )))];
+
+    for (let index = 0; index < paths.length; index += 12) {
+      const batch = paths.slice(index, index + 12);
+      await Promise.all(batch.map(async (path) => {
+        const assetResponse = await fetch(assetUrl(path), { cache: "force-cache" });
+        if (!assetResponse.ok) throw new Error(`Could not cache mobile asset: ${path}`);
+        await assetResponse.arrayBuffer();
+      }));
+    }
+  })().catch((error) => {
+    console.warn("Mobile asset pre-cache did not complete; continuing with on-demand loading.", error);
+  });
+
+  return runtime.mobileAssetPrefetchPromise;
 }
 
 function drawFrame(layer, image) {
@@ -342,7 +387,7 @@ function preloadFeatureSequence(feature) {
   return preloadSequence(featureSequence(feature));
 }
 
-function preloadFrontSideSequences() {
+async function preloadFrontSideSequences() {
   const criticalSequences = [
     playerConfig.sequences.buttons.previous,
     playerConfig.sequences.buttons.bbButton,
@@ -378,7 +423,8 @@ function preloadFrontSideSequences() {
   const criticalPreloads = criticalSequences.map((sequence) => preloadSequence(sequence));
   preloadVisualizerDecorationAssets();
   if (useMobileAssets) {
-    Promise.all(criticalPreloads).then(() => warmMobileFirstActions());
+    await Promise.all(criticalPreloads);
+    await warmMobileFirstActions();
     return;
   }
 
@@ -395,8 +441,19 @@ function preloadFrontSideSequences() {
 }
 
 async function warmMobileFirstActions() {
+  const ringFeature = playerConfig.sequences.features.bbNetworkRing;
   const firstActions = [
     featureSequence(playerConfig.sequences.features.trackslimes),
+    featureSequence(playerConfig.sequences.features.skeletonArm),
+    skeletonArmSequence("blackAndWhite"),
+    {
+      folder: ringFeature.folder,
+      frames: frameRange(ringFeature.firstFrame, ringFeature.loopStartFrame)
+    },
+    {
+      folder: ringFeature.blackAndWhiteFolder,
+      frames: frameRange(ringFeature.firstFrame, ringFeature.loopStartFrame)
+    },
     ...playerConfig.rotationControls
       .filter((control) => control.from === "front")
       .map((control) => rotationSequence(playerConfig.rotationTransitions[control.transition], "default"))
@@ -598,19 +655,20 @@ function syncStageScale(shell, stage) {
   const resize = () => {
     if (useMobileAssets) {
       const mobileLayout = mobileAssetConfig.layout || {};
-      const sideInset = mobileLayout.sideInset ?? 10;
-      const topInset = mobileLayout.topInset ?? 10;
-      const npRoot = playerConfig.npSkinRoot;
-      const highestVisibleY = npRoot.y + npRoot.movement.peak.y + npRoot.skinImage.y;
-      const lowestVisibleY = playerConfig.playerAssembly.y + playerConfig.playerAssembly.height;
-      const visibleHeight = lowestVisibleY - highestVisibleY;
-      const widthScale = Math.max(0, shell.clientWidth - sideInset * 2)
-        / playerConfig.playerAssembly.width;
-      const heightScale = Math.max(0, shell.clientHeight - topInset * 2) / visibleHeight;
-      const scale = Math.min(widthScale, heightScale);
-      const stageWidth = playerConfig.stage.width * scale;
-      const offsetX = (shell.clientWidth - stageWidth) / 2;
-      const offsetY = topInset - highestVisibleY * scale;
+      const edgeInset = mobileLayout.edgeInset ?? 10;
+      const anchor = mobileLayout.anchor || { x: 700, y: 670.536127 };
+      const bounds = mobileLayout.visibleBounds || { left: 341, top: 156, right: 1106, bottom: 1199 };
+      const viewportCenterX = shell.clientWidth / 2;
+      const viewportCenterY = shell.clientHeight / 2;
+      const scales = [
+        (viewportCenterX - edgeInset) / (anchor.x - bounds.left),
+        (shell.clientWidth - edgeInset - viewportCenterX) / (bounds.right - anchor.x),
+        (viewportCenterY - edgeInset) / (anchor.y - bounds.top),
+        (shell.clientHeight - edgeInset - viewportCenterY) / (bounds.bottom - anchor.y)
+      ];
+      const scale = Math.max(0, Math.min(...scales));
+      const offsetX = viewportCenterX - anchor.x * scale;
+      const offsetY = viewportCenterY - anchor.y * scale;
       stage.style.setProperty("--stage-scale", String(scale));
       stage.style.setProperty("--stage-offset-x", `${offsetX}px`);
       stage.style.setProperty("--stage-offset-y", `${offsetY}px`);
@@ -2376,16 +2434,14 @@ async function extendBBNetworkRing() {
     frames: frameRange(feature.firstFrame, feature.loopStartFrame)
   };
   const loopSequence = bbNetworkRingLoopSequence(feature);
-  const [loopImages] = await Promise.all([
-    preloadSequence(loopSequence),
-    preloadSequence(appearSequence)
-  ]);
+  preloadSequence(loopSequence);
+  await preloadSequence(appearSequence);
   playOneShot(playerConfig.audio.bbNetworkRingAppear);
   await animateImageSequence(runtime.layers.bbNetworkRingAnimation, appearSequence, { keepLastFrame: true, keepVisible: true });
   playerState.bbNetworkRingPlaying = true;
   runtime.beaconSoundAudio = loopAudio(playerConfig.audio.beaconSound, audioMix.ambientLoops);
   runtime.beaconBackgroundAudio = loopAudio(playerConfig.audio.beaconBackground, audioMix.ambientLoops);
-  startBBNetworkRingLoop(loopImages);
+  startBBNetworkRingLoop();
   renderState();
 }
 

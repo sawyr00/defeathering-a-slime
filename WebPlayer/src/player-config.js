@@ -1,6 +1,6 @@
 window.SlimeBallPlayerConfig = {
   assetRoot: "./Content",
-  assetVersion: "20260808-mobile-2",
+  assetVersion: "20260808-mobile-3",
   mobileAssets: {
     mediaQuery: "(max-width: 900px)",
     root: "WebPlayerOptimized/Mobile",
@@ -8,8 +8,9 @@ window.SlimeBallPlayerConfig = {
     sourceExclusions: ["buttons/masks/", "rotation/rotation click areas/"],
     targetSize: 720,
     layout: {
-      sideInset: 10,
-      topInset: 10
+      edgeInset: 10,
+      anchor: { x: 700, y: 670.536127 },
+      visibleBounds: { left: 341, top: 156, right: 1106, bottom: 1199 }
     }
   },
   frameRate: {
@@ -148,7 +149,7 @@ window.SlimeBallPlayerConfig = {
       scrollSpeed: 0.75,
       loopGap: 126,
       textScale: { x: 0.46, y: 0.52 },
-      mobileTranslationY: 5,
+      mobileTranslationY: 4,
       glowTranslation: { x: 0, y: 0 },
       color: "rgb(255, 6, 40)",
       fontSize: 52,
