@@ -282,6 +282,7 @@ async function revealInitialComposition() {
   } else {
     await initialImagesReady;
     updateStartupLoading(0.7, "PREPARING");
+    await Promise.all([initializeHitMasks(), preloadFrontSideSequences()]);
   }
 
   updateStartupLoading(0.98, "PREPARING");
@@ -290,10 +291,6 @@ async function revealInitialComposition() {
   runtime.layers.startupFade.classList.add("startup-fade-immediate");
   runtime.layers.startupLoader.classList.add("startup-loader-complete");
   runtime.layers.startupLoader.setAttribute("aria-hidden", "true");
-  if (!useMobileAssets) {
-    initializeHitMasks();
-    preloadFrontSideSequences();
-  }
 }
 
 function prefetchMobileAssetLibrary() {
@@ -424,6 +421,15 @@ function preloadFeatureSequence(feature) {
 }
 
 async function preloadFrontSideSequences() {
+  const ringFeature = playerConfig.sequences.features.bbNetworkRing;
+  const defaultRingLoopSequence = {
+    folder: ringFeature.folder,
+    frames: frameRange(ringFeature.loopStartFrame, ringFeature.loopEndFrame)
+  };
+  const blackAndWhiteRingLoopSequence = {
+    folder: ringFeature.blackAndWhiteFolder,
+    frames: frameRange(ringFeature.loopStartFrame, ringFeature.loopEndFrame)
+  };
   const criticalSequences = [
     playerConfig.sequences.buttons.previous,
     playerConfig.sequences.buttons.bbButton,
@@ -436,20 +442,8 @@ async function preloadFrontSideSequences() {
     featureSequence(playerConfig.sequences.features.trackslimes),
     featureSequence(playerConfig.sequences.features.skeletonArm),
     skeletonArmSequence("blackAndWhite"),
-    {
-      folder: playerConfig.sequences.features.bbNetworkRing.folder,
-      frames: frameRange(
-        playerConfig.sequences.features.bbNetworkRing.loopStartFrame,
-        playerConfig.sequences.features.bbNetworkRing.loopEndFrame
-      )
-    },
-    {
-      folder: playerConfig.sequences.features.bbNetworkRing.blackAndWhiteFolder,
-      frames: frameRange(
-        playerConfig.sequences.features.bbNetworkRing.loopStartFrame,
-        playerConfig.sequences.features.bbNetworkRing.loopEndFrame
-      )
-    }
+    defaultRingLoopSequence,
+    blackAndWhiteRingLoopSequence
   ];
   const rotationSequences = [
     ...Object.values(playerConfig.rotationTransitions).map((transition) => rotationSequence(transition, "default")),
@@ -457,16 +451,16 @@ async function preloadFrontSideSequences() {
   ];
 
   const criticalPreloads = criticalSequences.map((sequence) => preloadSequence(sequence));
+  const defaultRingLoopPreload = preloadSequence(defaultRingLoopSequence);
   preloadVisualizerDecorationAssets();
   if (useMobileAssets) {
-    await Promise.all(criticalPreloads);
-    await warmMobileFirstActions();
+    await Promise.all([...criticalPreloads, defaultRingLoopPreload, warmMobileFirstActions()]);
     return;
   }
 
+  await Promise.all([...criticalPreloads, defaultRingLoopPreload]);
   featureSequences
-    .filter((sequence) => sequence.folder === playerConfig.sequences.features.bbNetworkRing.folder
-      || sequence.folder === playerConfig.sequences.features.bbNetworkRing.blackAndWhiteFolder)
+    .filter((sequence) => sequence.folder === playerConfig.sequences.features.bbNetworkRing.blackAndWhiteFolder)
     .forEach((sequence) => preloadSequence(sequence));
   window.setTimeout(() => {
     [...featureSequences, ...rotationSequences].forEach((sequence) => preloadSequence(sequence));
@@ -2497,14 +2491,20 @@ async function extendBBNetworkRing() {
     frames: frameRange(feature.firstFrame, feature.loopStartFrame)
   };
   const loopSequence = bbNetworkRingLoopSequence(feature);
-  preloadSequence(loopSequence);
-  await preloadSequence(appearSequence);
+  const [appearImages, loopImages] = await Promise.all([
+    preloadSequence(appearSequence),
+    preloadSequence(loopSequence)
+  ]);
   playOneShot(playerConfig.audio.bbNetworkRingAppear);
-  await animateImageSequence(runtime.layers.bbNetworkRingAnimation, appearSequence, { keepLastFrame: true, keepVisible: true });
+  await animateImageSequence(runtime.layers.bbNetworkRingAnimation, appearSequence, {
+    keepLastFrame: true,
+    keepVisible: true,
+    preloadedImages: appearImages
+  });
   playerState.bbNetworkRingPlaying = true;
   runtime.beaconSoundAudio = loopAudio(playerConfig.audio.beaconSound, audioMix.ambientLoops);
   runtime.beaconBackgroundAudio = loopAudio(playerConfig.audio.beaconBackground, audioMix.ambientLoops);
-  startBBNetworkRingLoop();
+  startBBNetworkRingLoop(loopImages);
   renderState();
 }
 
