@@ -84,6 +84,7 @@ const runtime = {
   imageCache: new Map(),
   sequencePreloadPromises: new Map(),
   mobileAssetPrefetchPromise: null,
+  startupLoadingProgress: 0,
   npHoverTimer: null,
   npAnimationTimers: new Set(),
   npTransition: null,
@@ -265,6 +266,7 @@ async function waitForImageElement(image) {
 }
 
 async function revealInitialComposition() {
+  updateStartupLoading(0.02, "LOADING");
   const initialVisibleLayers = [
     runtime.layers.frontSkin,
     runtime.layers.hatchStatic,
@@ -275,13 +277,19 @@ async function revealInitialComposition() {
   const initialImagesReady = Promise.all(initialVisibleLayers.map(waitForImageElement));
   if (useMobileAssets) {
     await Promise.all([initialImagesReady, prefetchMobileAssetLibrary()]);
+    updateStartupLoading(0.92, "PREPARING");
     await Promise.all([initializeHitMasks(), preloadFrontSideSequences()]);
   } else {
     await initialImagesReady;
+    updateStartupLoading(0.7, "PREPARING");
   }
 
+  updateStartupLoading(0.98, "PREPARING");
   await nextAnimationFrame();
-  runtime.layers.startupFade.classList.add("startup-fade-complete");
+  updateStartupLoading(1, "READY");
+  runtime.layers.startupFade.classList.add("startup-fade-immediate");
+  runtime.layers.startupLoader.classList.add("startup-loader-complete");
+  runtime.layers.startupLoader.setAttribute("aria-hidden", "true");
   if (!useMobileAssets) {
     initializeHitMasks();
     preloadFrontSideSequences();
@@ -308,6 +316,9 @@ function prefetchMobileAssetLibrary() {
       )
     )))];
 
+    updateStartupLoading(0.05, "LOADING");
+    let completed = 0;
+
     for (let index = 0; index < paths.length; index += 12) {
       const batch = paths.slice(index, index + 12);
       await Promise.all(batch.map(async (path) => {
@@ -315,6 +326,9 @@ function prefetchMobileAssetLibrary() {
         if (!assetResponse.ok) throw new Error(`Could not cache mobile asset: ${path}`);
         await assetResponse.arrayBuffer();
       }));
+      completed += batch.length;
+      const downloadProgress = paths.length ? completed / paths.length : 1;
+      updateStartupLoading(0.05 + downloadProgress * 0.85, "LOADING");
     }
   })().catch((error) => {
     console.warn("Mobile asset pre-cache did not complete; continuing with on-demand loading.", error);
@@ -353,6 +367,28 @@ function clearCanvas(layer) {
 
 function nextAnimationFrame() {
   return new Promise((resolve) => requestAnimationFrame(resolve));
+}
+
+function updateStartupLoading(progress, label) {
+  const normalized = Math.max(
+    runtime.startupLoadingProgress,
+    Math.min(1, Math.max(0, progress))
+  );
+  runtime.startupLoadingProgress = normalized;
+  const percent = Math.round(normalized * 100);
+
+  if (runtime.layers.startupLoadingFill) {
+    runtime.layers.startupLoadingFill.style.width = `${percent}%`;
+  }
+  if (runtime.layers.startupLoadingPercent) {
+    runtime.layers.startupLoadingPercent.textContent = `${percent}%`;
+  }
+  if (runtime.layers.startupLoadingLabel && label) {
+    runtime.layers.startupLoadingLabel.textContent = label;
+  }
+  if (runtime.layers.startupLoader) {
+    runtime.layers.startupLoader.setAttribute("aria-valuenow", String(percent));
+  }
 }
 
 function preloadSequence(sequence) {
@@ -608,6 +644,33 @@ function buildPlayerShell() {
     zIndex: 100
   });
 
+  runtime.layers.startupLoader = document.createElement("div");
+  runtime.layers.startupLoader.className = "startup-loader";
+  runtime.layers.startupLoader.setAttribute("role", "progressbar");
+  runtime.layers.startupLoader.setAttribute("aria-label", "Player loading");
+  runtime.layers.startupLoader.setAttribute("aria-valuemin", "0");
+  runtime.layers.startupLoader.setAttribute("aria-valuemax", "100");
+  runtime.layers.startupLoader.setAttribute("aria-valuenow", "0");
+  const startupLoadingContent = document.createElement("div");
+  startupLoadingContent.className = "startup-loading-content";
+  runtime.layers.startupLoadingLabel = document.createElement("div");
+  runtime.layers.startupLoadingLabel.className = "startup-loading-label";
+  runtime.layers.startupLoadingLabel.textContent = "LOADING";
+  const startupLoadingTrack = document.createElement("div");
+  startupLoadingTrack.className = "startup-loading-track";
+  runtime.layers.startupLoadingFill = document.createElement("div");
+  runtime.layers.startupLoadingFill.className = "startup-loading-fill";
+  runtime.layers.startupLoadingPercent = document.createElement("div");
+  runtime.layers.startupLoadingPercent.className = "startup-loading-percent";
+  runtime.layers.startupLoadingPercent.textContent = "0%";
+  startupLoadingTrack.append(runtime.layers.startupLoadingFill);
+  startupLoadingContent.append(
+    runtime.layers.startupLoadingLabel,
+    startupLoadingTrack,
+    runtime.layers.startupLoadingPercent
+  );
+  runtime.layers.startupLoader.append(startupLoadingContent);
+
   runtime.layers.hitSurface = createLayer("hit-surface", {
     tag: "button",
     x: playerConfig.playerAssembly.x,
@@ -641,7 +704,7 @@ function buildPlayerShell() {
     runtime.layers.hitSurface
   );
 
-  shell.append(stage);
+  shell.append(stage, runtime.layers.startupLoader);
   app.replaceChildren(shell);
   syncStageScale(shell, stage);
   runtime.layers.hitSurface.addEventListener("click", handlePlayerClick);
